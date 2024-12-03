@@ -4,11 +4,11 @@ import android.app.Application
 import android.util.Log
 
 class MistClient : Application() {
-    lateinit var container: AppContainer
+    lateinit var applicationContext: ApplicationContext
 
     override fun onCreate() {
         super.onCreate()
         Log.d("MistClientApplication", "init")
-        container = AppContainer(this)
+        applicationContext = ApplicationContext(this)
     }
 }

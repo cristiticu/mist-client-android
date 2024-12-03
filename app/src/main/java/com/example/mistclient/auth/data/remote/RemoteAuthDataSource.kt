@@ -1,4 +1,4 @@
-package com.example.mistclient.auth.data
+package com.example.mistclient.auth.data.remote
 
 import android.util.Log
 import com.example.mistclient.api.Api
@@ -14,7 +14,7 @@ fun createPartFromString(stringData: String): RequestBody {
 
 
 class RemoteAuthDataSource {
-    private val routes = Api.retrofit.create(RemoteRoutes::class.java)
+    private val routes = Api.retrofit.create(AuthServiceRoutes::class.java)
 
     suspend fun login(credentials: UserCredentials): Result<AuthToken> {
         try {
@@ -22,7 +22,7 @@ class RemoteAuthDataSource {
             val password = createPartFromString((credentials.password))
 
             Log.d("RemoteAuthDataSource", "login")
-            
+
             return Result.success(routes.login(username, password))
         } catch (e: Exception) {
             Log.w("RemoteAuthDataSource", "login failed", e)
