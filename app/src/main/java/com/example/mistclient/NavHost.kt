@@ -7,13 +7,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.mistclient.auth.ui.LoginScreen
 import com.example.mistclient.games.ui.StoreGamesListScreen
 
 @Composable
 fun MistClientNavHost() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "/games") {
+    NavHost(navController = navController, startDestination = "/login") {
+        composable("/login") {
+            LoginScreen(onClose = { navController.navigate("/games") })
+        }
         composable("/games") {
             StoreGamesListScreen(onGameClick = { navController.navigate("/games/$it") })
         }

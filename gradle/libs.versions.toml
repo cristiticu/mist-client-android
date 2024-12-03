@@ -2,6 +2,9 @@
 agp = "8.7.2"
 kotlin = "2.0.20"
 kotlinSerializationJson = "1.7.3"
+kotlinCoroutinesCore = "1.9.0"
+kotlinCoroutinesAndroid = "1.9.0"
+retrofit2 = "2.9.0"
 
 activityCompose = "1.9.3"
 coreKtx = "1.13.1"
@@ -17,6 +20,10 @@ junitVersion = "1.2.1"
 coilCompose = "3.0.4"
 
 [libraries]
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit2" }
+converterGson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit2" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinCoroutinesAndroid" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinCoroutinesCore" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinSerializationJson" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
