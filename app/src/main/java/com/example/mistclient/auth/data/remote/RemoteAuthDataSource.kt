@@ -2,6 +2,7 @@ package com.example.mistclient.auth.data.remote
 
 import android.util.Log
 import com.example.mistclient.api.Api
+import com.example.mistclient.api.Result
 import com.example.mistclient.auth.AuthToken
 import com.example.mistclient.auth.UserCredentials
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -23,10 +24,10 @@ class RemoteAuthDataSource {
 
             Log.d("RemoteAuthDataSource", "login")
 
-            return Result.success(routes.login(username, password))
+            return Result.Success(routes.login(username, password))
         } catch (e: Exception) {
             Log.w("RemoteAuthDataSource", "login failed", e)
-            return Result.failure(e)
+            return Result.Error(e)
         }
     }
 }

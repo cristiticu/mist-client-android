@@ -1,6 +1,5 @@
 package com.example.mistclient
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -8,7 +7,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.mistclient.auth.ui.LoginScreen
-import com.example.mistclient.games.ui.StoreGamesListScreen
+import com.example.mistclient.games.ui.details.StoreGameDetailsScreen
+import com.example.mistclient.games.ui.list.StoreGamesListScreen
 
 @Composable
 fun MistClientNavHost() {
@@ -25,12 +25,14 @@ fun MistClientNavHost() {
             route = "/games/{id}",
             arguments = listOf(navArgument("id") { type = NavType.StringType })
         ) {
-            val gameId = it.arguments?.getString("id")
+            val guid = it.arguments?.getString("id")
 
-            if (gameId == null) {
+            if (guid == null) {
                 navController.popBackStack()
+                return@composable
             }
-            Text("Game details $gameId")
+
+            StoreGameDetailsScreen(guid)
         }
     }
 }
