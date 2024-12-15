@@ -5,6 +5,7 @@ import com.example.mistclient.api.Api
 import com.example.mistclient.api.Result
 import com.example.mistclient.auth.AuthToken
 import com.example.mistclient.auth.UserCredentials
+import com.example.mistclient.auth.toAuthToken
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -24,7 +25,7 @@ class RemoteAuthDataSource {
 
             Log.d("RemoteAuthDataSource", "login")
 
-            return Result.Success(routes.login(username, password))
+            return Result.Success(routes.login(username, password).toAuthToken())
         } catch (e: Exception) {
             Log.w("RemoteAuthDataSource", "login failed", e)
             return Result.Error(e)
