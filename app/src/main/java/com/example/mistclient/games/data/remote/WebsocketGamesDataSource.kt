@@ -6,6 +6,7 @@ import com.example.mistclient.games.Game
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 
@@ -34,7 +35,23 @@ class GamesWebSocketClient() {
     }
 }
 
-class GamesWebSocketListener(private val onNewGame: (Game) -> Unit) : WebSocketListener() {
+class GamesWebSocketListener(
+    private val onOpen: () -> Unit,
+    private val onClosed: () -> Unit,
+    private val onNewGame: (Game) -> Unit
+) : WebSocketListener() {
+    override fun onOpen(webSocket: WebSocket, response: Response) {
+        Log.d("GamesWebSocketListener", "onOpen")
+        super.onOpen(webSocket, response)
+        onOpen()
+    }
+
+    override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+        Log.d("GamesWebSocketListener", "onClosed")
+        super.onClosed(webSocket, code, reason)
+        onClosed()
+    }
+
     override fun onMessage(webSocket: WebSocket, text: String) {
         Log.d("GamesWebSocketListener", "got new message $text")
         val message = parseGameMessageJson(text) // Deserialize JSON to Game

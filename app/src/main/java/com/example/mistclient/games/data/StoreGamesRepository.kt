@@ -36,16 +36,17 @@ class StoreGamesRepository(
         Log.d("StoreGamesRepository", "init")
     }
 
-    fun connectWebSocket(webSocketUrl: String) {
+    fun connectWebSocket(webSocketUrl: String, onOpen: () -> Unit, onClosed: () -> Unit) {
         Log.d("StoreGamesRepository", "connect websocket")
-        webSocketClient.connect(webSocketUrl, GamesWebSocketListener { newGame ->
-            Log.d("StoreGamesRepository", "function new game $newGame")
-            CoroutineScope(Dispatchers.IO).launch {
-                Log.d("StoreGamesRepository", "adding new game $newGame")
-                cachedGamesPage.add(newGame)
-                _gamesPageFlow.emit(Result.Success(cachedGamesPage.toList()))
-            }
-        })
+        webSocketClient.connect(
+            webSocketUrl,
+            GamesWebSocketListener(onOpen = onOpen, onClosed = onClosed) { newGame ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    Log.d("StoreGamesRepository", "adding new game $newGame")
+                    cachedGamesPage.add(newGame)
+                    _gamesPageFlow.emit(Result.Success(cachedGamesPage.toList()))
+                }
+            })
     }
 
     fun disconnectWebSocket() {
@@ -55,52 +56,31 @@ class StoreGamesRepository(
 
     fun getGames(limit: Int?, offset: Int?) {
         CoroutineScope(Dispatchers.IO).launch {
-            when (val result = remoteStoreGamesDataSource.fetchGames(limit, offset)) {
-                is Result.Success -> {
-                    Log.d("StoreGamesRepository", "getAllGames emit fetched items")
-                    cachedGamesPage.addAll(result.data)
-                    _gamesPageFlow.emit(Result.Success(cachedGamesPage.toList()))
-                }
+            _gamesPageFlow.emit(Result.Loading)
+            if (cachedGamesPage.size > 0) {
+                Log.d("StoreGamesRepository", "getAllGames emit cached items")
+                _gamesPageFlow.emit(Result.Success(cachedGamesPage.toList()))
+            } else {
+                when (val result = remoteStoreGamesDataSource.fetchGames(limit, offset)) {
+                    is Result.Success -> {
+                        Log.d("StoreGamesRepository", "getAllGames emit fetched items")
+                        cachedGamesPage.clear()
+                        cachedGamesPage.addAll(result.data)
+                        _gamesPageFlow.emit(Result.Success(cachedGamesPage.toList()))
+                    }
 
-                is Result.Error -> {
-                    Log.w("StoreGamesRepository", "getAllGames emit error", result.exception)
-                    _gamesPageFlow.emit(Result.Error())
-                }
+                    is Result.Error -> {
+                        Log.w("StoreGamesRepository", "getAllGames emit error", result.exception)
+                        _gamesPageFlow.emit(Result.Error())
+                    }
 
-                is Result.Loading -> {
-                    _gamesPageFlow.emit(Result.Loading)
+                    is Result.Loading -> {
+                        _gamesPageFlow.emit(Result.Loading)
+                    }
                 }
             }
         }
     }
-
-//    fun getGames(limit: Int?, offset: Int?): Flow<Result<List<Game>>> = flow {
-//        Log.d("StoreGamesRepository", "getAllGames emit loading")
-//
-//        emit(Result.Loading)
-//
-//        if (cachedGamesPage.size > 0) {
-//            Log.d("StoreGamesRepository", "getAllGames emit cached items")
-//            emit(Result.Success(cachedGamesPage.toList()))
-//        } else {
-//            when (val result = remoteStoreGamesDataSource.fetchGames(limit, offset)) {
-//                is Result.Success -> {
-//                    Log.d("StoreGamesRepository", "getAllGames emit fetched items")
-//                    cachedGamesPage.addAll(result.data)
-//                    emit(Result.Success(cachedGamesPage.toList()))
-//                }
-//
-//                is Result.Error -> {
-//                    Log.w("StoreGamesRepository", "getAllGames emit error", result.exception)
-//                    emit(Result.Error())
-//                }
-//
-//                is Result.Loading -> {
-//                    emit(Result.Loading)
-//                }
-//            }
-//        }
-//    }.flowOn(Dispatchers.IO)
 
     fun getGame(guid: String): Flow<Result<Game>> = flow {
         Log.d("StoreGamesRepository", "getGame emit loading")
